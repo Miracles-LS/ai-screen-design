@@ -30,8 +30,12 @@ export function useCanvasRuler({ canvasRootRef, moveableRef, selectedTarget }) {
   const rectHeight = ref(800)
 
   // 画布的宽高，sketchRuler会根据画布的宽高自适应设置缩放比例。
-  const canvasWidth = toRef(canvas.value, 'width')
-  const canvasHeight = toRef(canvas.value, 'height')
+  const canvasWidth = computed(() => {
+    return canvas.value.width
+  })
+  const canvasHeight = computed(() => {
+    return canvas.value.height
+  })
   const canvasStyle = computed(() => {
     return {
       width: canvasWidth.value + 'px',
@@ -64,7 +68,7 @@ export function useCanvasRuler({ canvasRootRef, moveableRef, selectedTarget }) {
     // 组件销毁的声明周期也可写在声明周期内
     onUnmounted(() => {
       // 断开组件事件监听
-      ob.disconnect()
+      ob?.disconnect()
     })
   })
 

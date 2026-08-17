@@ -1,10 +1,15 @@
 import { defineStore } from 'pinia'
 
-import type { MaterialSchema } from '@/schema/material.ts'
-import type { PageSchema } from '@/schema/page.ts'
+import type { MaterialEvent, MaterialSchema } from '@/schema/material.ts'
+import type { DataSourceSchema, PageSchema } from '@/schema/page.ts'
 import { toRef } from 'vue'
+import { useUndoRedo } from '@/composables/useUndoRedo.ts'
+
+import type { EventOption } from '@/schema/material.ts'
 
 export const useEditorStore = defineStore('editor', () => {
+  const { applyChange } = useUndoRedo()
+
   const pannelVisable = reactive({
     // 物料面板是否可见
     material: true,
@@ -21,6 +26,59 @@ export const useEditorStore = defineStore('editor', () => {
       backgroundColor: '#0e121b',
     },
     nodes: <MaterialSchema[]>[],
+    dataSources: [
+      {
+        type: 'static',
+        id: '122',
+        name: '销售数据',
+        data: [
+          {
+            label: '一月',
+            value: 100,
+          },
+          {
+            label: '二月',
+            value: 200,
+          },
+          {
+            label: '三月',
+            value: 300,
+          },
+        ],
+      },
+      {
+        type: 'static',
+        id: '456',
+        name: '访问数据',
+        data: [
+          {
+            label: '四月',
+            value: 400,
+          },
+          {
+            label: '五月',
+            value: 500,
+          },
+          {
+            label: '六月',
+            value: 600,
+          },
+        ],
+      },
+      {
+        type: 'api',
+        id: '789',
+        name: '上升趋势',
+        url: '/api/data',
+        method: 'get',
+        // responsePath: 'list',
+        data: [],
+        // interval: 2000,
+        params: {
+          date: '2029-20-29',
+        },
+      },
+    ],
   })
 
   // 当前画布的配置
@@ -28,6 +86,9 @@ export const useEditorStore = defineStore('editor', () => {
 
   // 当前画布中显示的所有组件列表
   const nodes = toRef(page.value, 'nodes')
+
+  // 当前画布中显示的所有组件列表
+  const dataSources = toRef(page.value, 'dataSources')
 
   // 当前(多选)选中的组件节点id数组（可单选，多选）
   const selectedNodeIds = ref([])
@@ -43,9 +104,15 @@ export const useEditorStore = defineStore('editor', () => {
     return nodes.value.find(node => node.id === selectedNodeId.value)
   })
 
+  // 通过 applyChange方法 修改 nodes.value，这样可以将操作记录到撤销栈内，实现操作的撤销和回退
+  function setNodesByApplyChange(key: string, newNodes: any) {
+    applyChange(nodes, key, newNodes)
+  }
+
   // 给画布组件列表新增新的组件节点
   function addNode(node: MaterialSchema) {
-    nodes.value.push(node)
+    // nodes.value.push(node)
+    setNodesByApplyChange('value', [...nodes.value, node])
   }
 
   // 设置当前选中（单选）的组件/node节点
@@ -80,7 +147,11 @@ export const useEditorStore = defineStore('editor', () => {
   }
   // 移除节点
   function removeNode(node: MaterialSchema) {
-    nodes.value = nodes.value.filter(item => item.id !== node.id)
+    setNodesByApplyChange(
+      'value',
+      nodes.value.filter(item => item.id !== node.id)
+    )
+    // nodes.value = nodes.value.filter(item => item.id !== node.id)
     selectedNodeIds.value = selectedNodeIds.value.filter(id => id !== node.id)
   }
   // 置顶节点
@@ -88,20 +159,35 @@ export const useEditorStore = defineStore('editor', () => {
     // [a,b,c,d] => [c,a,b,d]
     // 先找到要移除的 node 的 index，再根据原 index 位置把元素剔除，最后再将该元素插入到数组的第一项，即为置顶
     const index = nodes.value.findIndex(item => item.id === node.id)
-    nodes.value.splice(index, 1)
-    nodes.value.unshift(node)
+    // toSpliced()：这是新js的新api，原api splice()会修改原数组的结构，toSpliced不会修改元素组结构，返回结果为新数组。
+    const splicedNodes = nodes.value.toSpliced(index, 1)
+    setNodesByApplyChange('value', [node, ...splicedNodes])
   }
   // 置底节点
   function moveNodeBottom(node: MaterialSchema) {
     // [a,b,c,d] => [a,b,d,c]
     // 先找到要移除的 node 的 index，再根据原 index 位置把元素剔除，最后再将该元素插入到数组的最后一项，即为置底
     const index = nodes.value.findIndex(item => item.id === node.id)
-    nodes.value.splice(index, 1)
-    nodes.value.push(node)
+    const splicedNodes = nodes.value.toSpliced(index, 1)
+    setNodesByApplyChange('value', [...splicedNodes, node])
   }
   // 锁定节点
   function toggleNodeLock(node: MaterialSchema) {
-    node.locked = !node.locked
+    // node.locked = !node.locked
+    setNodesByApplyChange('locked', !node.locked)
+  }
+
+  // 通过 nodeId 更新 nodes 对应的那个 node 数据
+  function updateNodes(id: string, newNode: MaterialSchema) {
+    // 使用map返回新列表，在新列表中做了替换
+    const updatedNodes = nodes.value.map(node => (node.id === id ? newNode : node))
+    // 更新新的nodes，并记录到撤销栈内
+    setNodesByApplyChange('value', updatedNodes)
+  }
+
+  function setPage(newPage: PageSchema) {
+    // 合并 newPage 的所有属性到 page.value 中，不能直接 page.value = newPage，因为会使
+    Object.assign(page.value, newPage)
   }
 
   return {
@@ -109,6 +195,7 @@ export const useEditorStore = defineStore('editor', () => {
     page,
     canvas,
     nodes,
+    dataSources,
     selectedNodeId,
     selectedNodeIds,
     selectedNode,
@@ -122,5 +209,7 @@ export const useEditorStore = defineStore('editor', () => {
     moveNodeTop,
     moveNodeBottom,
     toggleNodeLock,
+    updateNodes,
+    setPage,
   }
 })

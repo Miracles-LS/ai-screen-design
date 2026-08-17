@@ -22,6 +22,7 @@ export function debounce(fn, ms) {
  *  getValue(obj,'prop.content');
  * */
 export function getValue(target, key) {
+  if (!key) return target
   // 'props.content'
   const keys = key.split('.') // ['prop','content']
   while (keys.length) {
@@ -39,6 +40,17 @@ export function setValue(target, key, value) {
   // 'props.content'
   const keys = key.split('.') // ['prop','content']
   const lastKey = keys.pop() //拿到最后一个key值，并改变了原数组（将最后一项元素剔除）
-  const _target = getValue(target, keys.join('.'))
-  _target[lastKey] = value
+  if (keys.length) {
+    target = getValue(target, keys.join('.'))
+  }
+  target[lastKey] = value
+}
+
+export function deepClone<T>(value: T): T {
+  // 拦截基础类型
+  if (typeof value !== 'object' || value === null) {
+    // null typeof也是object，所以这里也需要排除 null
+    return value
+  }
+  return JSON.parse(JSON.stringify(value))
 }

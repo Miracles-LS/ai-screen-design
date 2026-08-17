@@ -19,6 +19,11 @@ const textMaterial: MaterialDefinition = {
       label: '颜色',
       key: 'style.color',
     },
+    {
+      type: 'number',
+      label: '字号',
+      key: 'style.fontSize',
+    },
   ],
   // 用于画布面板展示的组件列表 schema 数据格式
   schema: {
@@ -32,12 +37,22 @@ const textMaterial: MaterialDefinition = {
       height: 50,
     },
     style: {
-      color: 'red',
+      color: '#fff',
+      fontSize: 16,
     },
     props: {
       content: 'hello world',
     },
+    // 物料组件动态添加的事件列表
+    events: [],
   },
+  // 事件配置--所有事件类型
+  eventOptions: [
+    {
+      label: '文本组件特有的通用事件',
+      value: 'fn',
+    },
+  ],
 }
 
 export function install(register: Function) {

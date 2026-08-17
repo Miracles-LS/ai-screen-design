@@ -48,8 +48,14 @@ const {
 } = useCanvasRuler({ canvasRootRef, moveableRef, selectedTarget })
 
 // 组合式函数导入 Moveable 组件相关的方法和变量
-const { onMoveableDrag, onMoveableResize, onMoveableDragGroup, onMoveableResizeGroup } =
-  useMoveable()
+const {
+  onMoveableDrag,
+  onMoveableResize,
+  onMoveableDragGroup,
+  onMoveableResizeGroup,
+  onStart,
+  onEnd,
+} = useMoveable(moveableRef)
 </script>
 
 <template>
@@ -121,10 +127,18 @@ const { onMoveableDrag, onMoveableResize, onMoveableDragGroup, onMoveableResizeG
       :target="selectedTarget"
       :draggable="true"
       @drag="onMoveableDrag"
+      @dragStart="onStart"
+      @dragEnd="onEnd"
       @dragGroup="onMoveableDragGroup"
+      @dragGroupStart="onStart"
+      @dragGroupEnd="onEnd"
       :resizable="true"
       @resize="onMoveableResize"
+      @resizeStart="onStart"
+      @resizeEnd="onEnd"
       @resizeGroup="onMoveableResizeGroup"
+      @resizeGroupStart="onStart"
+      @resizeGroupEnd="onEnd"
       :origin="false"
     />
   </div>
@@ -132,6 +146,12 @@ const { onMoveableDrag, onMoveableResize, onMoveableDragGroup, onMoveableResizeG
 
 <style scoped lang="scss">
 .canvas-root {
+  position: relative;
+  overflow: hidden;
+  /*  为了处理 moveable 组件的选框的不会覆盖到 物料、布局、属性面板。
+  *   isolation 创建新的层级上下文，相当于原 moveable 组件设置的层级关系只会作用于 .canvas-root 这个div层级内部，不会影响到  .canvas-root 外层的层级关系
+  */
+  isolation: isolate;
   .canvas-stage {
     position: relative;
     width: 900px;

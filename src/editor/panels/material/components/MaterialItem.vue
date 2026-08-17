@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Icon } from '@iconify/vue'
+
 defineOptions({
   name: 'MaterialItem',
 })
@@ -48,6 +50,7 @@ function onDragStart(e: DragEvent) {
     justify-content: center;
     border: 1px solid var(--border-color);
     border-radius: 4px;
+    padding: 10px;
   }
 }
 </style>

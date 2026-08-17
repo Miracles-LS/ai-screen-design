@@ -1,6 +1,8 @@
 // 物料分组
 import type { MaterialDefinition, MaterialSchema } from '@/schema/material.ts'
 
+import { LifeEventOptions, HtmlEventOptions } from '@/public/EventOptions.ts'
+
 const materialGroup = [
   {
     name: '图表',
@@ -38,7 +40,7 @@ const componentMap = new Map()
 //   ]
 //    ....
 // ]
-const setterMap = new Map()
+const materialMap = new Map()
 
 export function register(material: MaterialDefinition, component: Component) {
   materialItems.push(material)
@@ -46,7 +48,7 @@ export function register(material: MaterialDefinition, component: Component) {
   // 将物料组件通过 schema.type 的值绑定到对应的物料组件，建立关联关系
   componentMap.set(material.schema.type, component)
   // 将物料组件通过 schema.type 的值绑定到对应的属性动态表单属性数据，建立关联关系
-  setterMap.set(material.schema.type, material.setters)
+  materialMap.set(material.schema.type, material)
 }
 
 // vite批量处理导入所有物料组件的index.ts文件
@@ -78,7 +80,28 @@ export function getMaterialComponent(type: string) {
 
 // 通过 schema 类型名找到对应的物料属性配置
 export function getMaterialSetter(type: string) {
-  return setterMap.get(type)
+  return materialMap.get(type)?.setters || []
+}
+// 通过 schema 类型名找到对应的事件下拉列表
+export function getMaterialEventOptions(type: string) {
+  const componentEventOptions = materialMap.get(type)?.eventOptions || []
+
+  const cascaderEventOptions = [
+    {
+      label: '组件特有事件',
+      options: [...componentEventOptions],
+    },
+    {
+      label: '生命周期事件',
+      options: [...LifeEventOptions],
+    },
+    {
+      label: 'HTML原生事件',
+      options: [...HtmlEventOptions],
+    },
+  ]
+
+  return cascaderEventOptions
 }
 
 // 创建 schema node 节点，目前是为了给节点添加id

@@ -6,6 +6,24 @@ interface Layout {
   height: number
 }
 
+export interface MaterialEvent {
+  // 事件类型 click mousedown
+  type: string
+  // 事件名/函数名/方法名
+  name: string
+  // 事件标题
+  title: string
+  /*
+   * 函数体
+   * const code = 'console.log()'
+   * const fn = new Function(code)
+   * fn(123)
+   * */
+  code: string
+  // 最终通过 type + code 生成的函数
+  handler?: Function
+}
+
 // 物料schema 的类型约束
 export interface MaterialSchema {
   id?: string
@@ -16,6 +34,9 @@ export interface MaterialSchema {
   style?: Record<string, any>
   props: Record<string, any>
   locked?: boolean
+  // 数据源id
+  dataId?: string
+  events?: MaterialEvent[]
 }
 
 interface SetterSchema {
@@ -23,6 +44,11 @@ interface SetterSchema {
   label: string
   key: string
   [key: string]: any
+}
+
+export interface EventOption {
+  label: string
+  value: string
 }
 
 // 物料 DSL 的类型约束
@@ -34,4 +60,5 @@ export interface MaterialDefinition {
   //endregion
   setters: SetterSchema[]
   schema: Omit<MaterialSchema, 'id'>
+  eventOptions?: EventOption[]
 }

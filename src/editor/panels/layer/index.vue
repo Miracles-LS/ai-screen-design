@@ -2,6 +2,7 @@
 import { useEditorStore } from '@/stores/editor.ts'
 import { storeToRefs } from 'pinia'
 import { useDraggable } from 'vue-draggable-plus'
+import { Icon } from '@iconify/vue'
 
 defineOptions({
   name: 'LayerPanel',

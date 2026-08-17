@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MaterialItem from '@/editor/panels/material/components/MaterialItem.vue'
 import { getMaterialByGroup, getMaterialGroups } from '@/materials'
+import { Icon } from '@iconify/vue'
 
 defineOptions({
   name: 'MaterialPanel',

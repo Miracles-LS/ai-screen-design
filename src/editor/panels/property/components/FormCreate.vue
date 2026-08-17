@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ElColorPicker, ElInput, ElInputNumber } from 'element-plus'
+import { ElCheckbox, ElColorPicker, ElInput, ElInputNumber, ElSelect } from 'element-plus'
 import { getValue, setValue } from '@/utils'
+import { useUndoRedo } from '@/composables/useUndoRedo.ts'
+import EditSelectOptins from '@/editor/panels/property/components/EditSelectOptins.vue'
 
 defineOptions({
   name: 'FormCreate',
@@ -20,7 +22,13 @@ const componentMap = {
     return h(ElInputNumber, { precision: 0, ...props }, slots)
   },
   color: ElColorPicker,
+  checkbox: ElCheckbox,
+  select: ElSelect,
+  editSelectOptions: EditSelectOptins,
 }
+
+// 为了记录撤销和回退记录，所以用一个方法包装了 setValue
+const { applyChange, startBatch, commitBatch } = useUndoRedo()
 </script>
 
 <template>
@@ -31,11 +39,14 @@ const componentMap = {
           <component
             :is="componentMap[item.type]"
             :modelValue="getValue(formData, item.key)"
+            v-bind="item.props"
             @update:modelValue="
               newValue => {
-                setValue(formData, item.key, newValue)
+                applyChange(formData, item.key, newValue)
               }
             "
+            @focus="startBatch"
+            @blur="commitBatch"
           ></component>
         </el-form-item>
       </el-col>
