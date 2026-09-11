@@ -1,5 +1,6 @@
 import SelectMaterialComponent from './component.vue'
 import type { MaterialDefinition } from '@/schema/material.ts'
+import { SelectSchema } from '@/materials/select/schema.ts'
 
 const selectMaterial: MaterialDefinition = {
   // 物料元数据
@@ -7,6 +8,7 @@ const selectMaterial: MaterialDefinition = {
   icon: 'formkit:select',
   group: 'info',
   // 。。。
+  configSchema: SelectSchema,
   // 用于文本组件属性面板的，动态表单数据生成数据格式
   setters: [
     {
@@ -163,7 +165,7 @@ const selectMaterial: MaterialDefinition = {
       ],
     },
     // 物料组件动态添加的事件列表
-    eventOptions: [],
+    // eventOptions: [],
   },
 }
 

@@ -99,10 +99,20 @@ function onPublish() {
   const id = publishPage(page.value)
   router.push(`/screen?id=${id}`)
 }
+
+// 打开AI弹窗
+function showAiPanel() {
+  editorStore.pannelVisable.ai = !editorStore.pannelVisable.ai
+}
 </script>
 
 <template>
   <div class="flex gap-20 tool-right justify-end">
+    <el-tooltip content="AI智能" placement="bottom" effect="dark">
+      <span @click="showAiPanel">
+        <Icon icon="ri:ai"></Icon>
+      </span>
+    </el-tooltip>
     <el-tooltip content="预览" placement="bottom" effect="dark">
       <span @click="onPreviewPage">
         <Icon icon="icon-park-outline:preview-open"></Icon>

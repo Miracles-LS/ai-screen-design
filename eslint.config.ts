@@ -26,6 +26,12 @@ export default defineConfigWithVueTs(
   skipFormatting,
   {
     name: 'custom/lint',
-    'vue/multi-word-component-names': 'off',
+    rules: {
+      'vue/multi-word-component-names': 'off',
+      // 关闭限制不能使用 Function
+      '@typescript-eslint/no-unsafe-function-type': 'off',
+      // 关闭限制不能使用 any
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
   }
 )

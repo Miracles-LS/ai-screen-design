@@ -111,3 +111,44 @@ export function createNode(node: MaterialSchema) {
     id: crypto.randomUUID(),
   }
 }
+
+export function getAllMaterialSchema() {
+  const list = materialItems
+    .filter(material => material.configSchema)
+    .map(item => {
+      return {
+        name: item.name,
+        type: item.schema.type,
+        // Zod Schema 是 JavaScript 运行时对象，不能直接作为 Graph Input 通过 http 请求传输的话得转成标准的 json，所以这发送前需要调用 toJSONSchema()，把它转换成普通 JSON
+        configSchema: item.configSchema.toJSONSchema(),
+      }
+    })
+  console.log(list)
+  return list
+
+  /*
+   * 最终每个物料会得到下面这种结构：
+   * {
+      "name": "文本",
+      "type": "text",
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "text"
+          },
+          "props": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string",
+                "description": "文本物料实际展示的文字内容；真实字段是 props.content"
+              }
+            }
+          }
+        }
+      }
+    }
+   *
+   * */
+}

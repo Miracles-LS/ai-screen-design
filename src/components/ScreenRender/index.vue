@@ -118,7 +118,7 @@ onMounted(() => {
         :data-node-locked="node.locked"
         :style="getNodeStyle(node, index)"
       >
-        <!--    由于 component 是遍历出来的，所以此时拿到的ref也是个数组    -->
+        <!--    由于 components 是遍历出来的，所以此时拿到的ref也是个数组    -->
         <component
           :ref="node.id"
           :is="getMaterialComponent(node.type)"

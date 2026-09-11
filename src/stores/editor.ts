@@ -12,11 +12,13 @@ export const useEditorStore = defineStore('editor', () => {
 
   const pannelVisable = reactive({
     // 物料面板是否可见
-    material: true,
+    material: false,
     // 图层面板是否可见
-    layer: true,
+    layer: false,
     // 属性面板是否可见
-    property: true,
+    property: false,
+    // ai面板是否可见
+    ai: true,
   })
 
   const page = ref<PageSchema>({

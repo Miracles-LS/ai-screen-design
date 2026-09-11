@@ -1,4 +1,6 @@
 // 布局schema 的类型约束
+import type { ZodType } from 'zod'
+
 interface Layout {
   x: number
   y: number
@@ -22,6 +24,7 @@ export interface MaterialEvent {
   code: string
   // 最终通过 type + code 生成的函数
   handler?: Function
+  //   Function 等同于 (...args:any[])=>void 这种写法。表示函数有任意的参数（...args:any[]）和任意的返回值（void）
 }
 
 // 物料schema 的类型约束
@@ -57,6 +60,7 @@ export interface MaterialDefinition {
   name: string
   icon: string
   group: string
+  configSchema: ZodType
   //endregion
   setters: SetterSchema[]
   schema: Omit<MaterialSchema, 'id'>

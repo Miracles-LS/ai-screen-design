@@ -1,5 +1,6 @@
 import TextMaterialComponent from './component.vue'
 import type { MaterialDefinition } from '@/schema/material.ts'
+import { TextSchema } from '@/materials/text/schema.ts'
 
 const textMaterial: MaterialDefinition = {
   // 物料元数据
@@ -7,6 +8,7 @@ const textMaterial: MaterialDefinition = {
   icon: 'solar:text-bold',
   group: 'info',
   // 。。。
+  configSchema: TextSchema,
   // 用于文本组件属性面板的，动态表单数据生成数据格式
   setters: [
     {
