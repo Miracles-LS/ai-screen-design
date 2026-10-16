@@ -181,6 +181,12 @@ export const useEditorStore = defineStore('editor', () => {
 
   // 通过 nodeId 更新 nodes 对应的那个 node 数据
   function updateNodes(id: string, newNode: MaterialSchema) {
+    //region 兼容传参只有newNode，没有传id的情况
+    if (!newNode && typeof id === 'object') {
+      newNode = id
+      id = newNode.id
+    }
+    //endregion
     // 使用map返回新列表，在新列表中做了替换
     const updatedNodes = nodes.value.map(node => (node.id === id ? newNode : node))
     // 更新新的nodes，并记录到撤销栈内
@@ -190,6 +196,21 @@ export const useEditorStore = defineStore('editor', () => {
   function setPage(newPage: PageSchema) {
     // 合并 newPage 的所有属性到 page.value 中，不能直接 page.value = newPage，因为会使
     Object.assign(page.value, newPage)
+  }
+
+  // 新增数据源
+  function addDataSource(dataSource: DataSourceSchema) {
+    const newDataSource = [...dataSources.value, dataSource]
+    applyChange(dataSources, 'value', newDataSource)
+  }
+
+  // 更新数据源
+  function updateDataSource(dataSource: DataSourceSchema) {
+    if (!dataSources.value.some(item => item.id === dataSource.id)) {
+      throw new Error(`数据源不存在：${dataSource.id}`)
+    }
+    const newDataSources = dataSources.value.map(ds => (ds.id === dataSource.id ? dataSource : ds))
+    applyChange(dataSources, 'value', newDataSources)
   }
 
   return {
@@ -213,5 +234,7 @@ export const useEditorStore = defineStore('editor', () => {
     toggleNodeLock,
     updateNodes,
     setPage,
+    addDataSource,
+    updateDataSource,
   }
 })

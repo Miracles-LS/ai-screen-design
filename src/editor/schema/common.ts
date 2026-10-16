@@ -10,7 +10,10 @@
 import { z } from 'zod'
 
 //region 对象 schema————描述键名为字符串、值为任意 JSON 值的普通对象。
-export const JsonObjectSchema = z.record(z.string(), z.json())
+export const JsonObjectSchema = z.record(z.string(), z.json()).meta({
+  // 可以附加任意属性。例如给 series 里添加 Echarts 图表该配置的属性，false则不能添加
+  additionalProperties: true,
+})
 //endregion
 
 //region 布局 schema————描述所有物料节点共用的位置和尺寸信息。

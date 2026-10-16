@@ -3,6 +3,8 @@ import type { MaterialDefinition, MaterialSchema } from '@/schema/material.ts'
 
 import { LifeEventOptions, HtmlEventOptions } from '@/public/EventOptions.ts'
 
+import { toJSONSchema } from '@/utils/agent-schema.ts'
+
 const materialGroup = [
   {
     name: '图表',
@@ -120,10 +122,9 @@ export function getAllMaterialSchema() {
         name: item.name,
         type: item.schema.type,
         // Zod Schema 是 JavaScript 运行时对象，不能直接作为 Graph Input 通过 http 请求传输的话得转成标准的 json，所以这发送前需要调用 toJSONSchema()，把它转换成普通 JSON
-        configSchema: item.configSchema.toJSONSchema(),
+        configSchema: toJSONSchema(item.configSchema),
       }
     })
-  console.log(list)
   return list
 
   /*

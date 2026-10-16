@@ -28,6 +28,12 @@ function onScroll() {
   isScroll = el.scrollHeight - el.scrollTop - el.clientHeight <= 50
 }
 
+const showAiLoading = computed(() => {
+  if (!props.isLoading) return false
+  // 最后一条消息不是 ai 类型，且是在 loading 状态，才需要显示AI回复消息的 ... 状态
+  return props.messages.at(-1)?.type !== 'ai'
+})
+
 onMounted(() => {
   const resizeObserver = new ResizeObserver(() => {
     // 监听到消息列表的高度发生变化后，自动滚动到最底部，保证用户始终能看到最新消息
@@ -80,6 +86,12 @@ onMounted(() => {
               final：代码块是否自闭合
               -->
           <span v-else class="typing">...</span>
+        </div>
+      </div>
+      <div v-if="showAiLoading" class="message-box message-box-ai flex gap-10">
+        <el-avatar :size="28">AI</el-avatar>
+        <div class="message-content">
+          <span class="typing">...</span>
         </div>
       </div>
     </div>

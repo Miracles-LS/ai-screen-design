@@ -6,8 +6,9 @@ import { Icon } from '@iconify/vue'
 import { useEditorStore } from '@/stores/editor.ts'
 import { storeToRefs } from 'pinia'
 import { getAllMaterialSchema } from '@/materials'
-import { CanvasSchema } from '@/editor/schema/common.ts'
+import { CanvasSchema, DataSourceSchema } from '@/editor/schema/common.ts'
 import { deepClone } from '@/utils'
+import { toJSONSchema } from '@/utils/agent-schema.ts'
 
 defineOptions({
   name: 'AiPanel',
@@ -17,7 +18,7 @@ const message = ref('')
 
 const editorStore = useEditorStore()
 const { page, selectedNodeIds } = storeToRefs(editorStore)
-
+const activeRunId = ref<string>(null)
 const {
   messages,
   submit,
@@ -34,29 +35,43 @@ const {
   threadId: getThreadId(),
   // 创建新会话后，langchain/vue 会创建一个新的会话 ID，从这个 onThreaId 回调函数能够拿到会话ID。这里将新的会话 ID 写入 localStorage。
   onThreadId: setThreadId,
+  onCreated({ runId }) {
+    // 创建会话时，会自动创建一个执行id，也就是runId。
+    activeRunId.value = runId
+  },
 })
+
+console.log('messages ==> ', messages)
+
+const methodMap = {
+  add_node: 'addNode',
+  update_node: 'updateNodes',
+  remove_node: 'removeNode',
+  add_data_source: 'addDataSource',
+  update_data_source: 'updateDataSource',
+}
 
 // 监听 state中 action 发生变化后，调用编辑器已有的 addNode() 方法
 watch(
-  () => langgraphState.value.action,
-  (action: any) => {
-    console.log('action ==> ', action)
-    if (!action) return
-    const actionNode = deepClone(toRaw(action.node))
+  () => langgraphState.value.actions,
+  (actions: any) => {
+    console.log('actions ==> ', actions)
+    if (!actions.length) return
     // 后端通知前端新增节点后，调用编辑器已有的 addNode() 方法
-    if (action.type === 'add_node') {
+    for (const action of actions) {
+      const actionNode = deepClone(toRaw(action.node))
       // toRaw 是获取被处理成响应式对象的原始数据/对象
       // deepClone 防止新增或修改后的数据导致原始数据被修改，影响由源数据处理过后的响应式数据受影响。所以这里直接进行深拷贝处理
-      editorStore.addNode(actionNode)
-      editorStore.selectNode(actionNode.id)
-    } else if (action.type === 'update_node') {
-      editorStore.updateNodes(actionNode.id, actionNode)
-    } else if (action.type === 'delete_node') {
-      editorStore.removeNode(actionNode)
+      const method = methodMap[action.type]
+      editorStore[method](actionNode)
+      if (action.type === 'add_node') {
+        editorStore.selectNode(actionNode.id)
+      }
     }
   }
 )
 
+// 提交用户消息，发起对话
 function onSubmit() {
   if (isLoading.value || !message.value) return
   submit({
@@ -69,9 +84,11 @@ function onSubmit() {
     ],
     page: page.value,
     selectedNodeIds: selectedNodeIds.value,
+    dataSources: editorStore.dataSources,
     schema: {
       materials: getAllMaterialSchema(),
-      canvas: CanvasSchema.toJSONSchema(),
+      canvas: toJSONSchema(CanvasSchema),
+      dataSourceSchema: toJSONSchema(DataSourceSchema),
     },
   })
   message.value = ''
@@ -86,8 +103,9 @@ function onKeydown(e: KeyboardEvent) {
 }
 
 // AI正在回复的停止功能
-function onStop() {
-  stop()
+async function onStop() {
+  // 用户停止消息后继续发送消息，需要取消掉上次执行的任务，直接按照用户接下来发送的最新消息进行响应回复。相当于回滚了上次发送的用户消息。
+  await client.runs.cancel(getThreadId(), activeRunId.value, true, 'rollback')
 }
 
 // 删除当前会话记录
