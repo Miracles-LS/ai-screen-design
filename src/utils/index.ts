@@ -1,3 +1,4 @@
+import { get, set } from 'lodash-es'
 export function debounce(fn, ms) {
   let timer
   return function (this, ...args) {
@@ -22,14 +23,16 @@ export function debounce(fn, ms) {
  *  getValue(obj,'prop.content');
  * */
 export function getValue(target, key) {
-  if (!key) return target
-  // 'props.content'
-  const keys = key.split('.') // ['prop','content']
-  while (keys.length) {
-    const key = keys.shift() //shift() 可拿到数组的第一个元素，并改变原数组（将第一项元素剔除）
-    target = target[key]
-  }
-  return target
+  //直接用lodash-es的get方法
+  return get(target, key)
+  // if (!key) return target
+  // // 'props.content'
+  // const keys = key.split('.') // ['prop','content']
+  // while (keys.length) {
+  //   const key = keys.shift() //shift() 可拿到数组的第一个元素，并改变原数组（将第一项元素剔除）
+  //   target = target[key]
+  // }
+  // return target
 }
 
 /*
@@ -37,13 +40,14 @@ export function getValue(target, key) {
  * setValue(obj,'prop.content',2);
  * */
 export function setValue(target, key, value) {
-  // 'props.content'
-  const keys = key.split('.') // ['prop','content']
-  const lastKey = keys.pop() //拿到最后一个key值，并改变了原数组（将最后一项元素剔除）
-  if (keys.length) {
-    target = getValue(target, keys.join('.'))
-  }
-  target[lastKey] = value
+  return set(target, key, value)
+  // // 'props.content'
+  // const keys = key.split('.') // ['prop','content']
+  // const lastKey = keys.pop() //拿到最后一个key值，并改变了原数组（将最后一项元素剔除）
+  // if (keys.length) {
+  //   target = getValue(target, keys.join('.'))
+  // }
+  // target[lastKey] = value
 }
 
 export function deepClone<T>(value: T): T {

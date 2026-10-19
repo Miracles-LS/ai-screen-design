@@ -84,7 +84,12 @@ function onSubmit() {
     ],
     page: page.value,
     selectedNodeIds: selectedNodeIds.value,
-    dataSources: editorStore.dataSources,
+    dataSources: editorStore.dataSources.map(({ id, name, type, dataDescription }) => ({
+      id,
+      name,
+      type,
+      dataDescription,
+    })),
     schema: {
       materials: getAllMaterialSchema(),
       canvas: toJSONSchema(CanvasSchema),

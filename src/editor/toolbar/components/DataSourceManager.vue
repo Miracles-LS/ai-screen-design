@@ -45,6 +45,7 @@ function onAdd() {
     type: 'static',
     data: '',
     params: '{}',
+    dataDescription: '',
   })
   // 新增后选中新增那一项
   selectDataSource(data.value.at(-1))
@@ -107,6 +108,9 @@ defineExpose({
             <el-radio-button label="静态" value="static"></el-radio-button>
             <el-radio-button label="API" value="api"></el-radio-button>
           </el-radio-group>
+        </el-form-item>
+        <el-form-item label="数据描述">
+          <el-input type="textarea" v-model="activeSource.dataDescription"></el-input>
         </el-form-item>
         <el-form-item label="数据" v-if="activeSource.type === 'static'">
           <MonacoEditor v-model="activeSource.data" />

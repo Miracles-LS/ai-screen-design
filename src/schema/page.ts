@@ -15,6 +15,8 @@ export interface DataSourceSchema {
   type: 'static' | 'api'
   id: string
   name: string
+  // data 字段的描述信息
+  dataDescription: string
   data: any
   // api接口请求地址
   url?: string

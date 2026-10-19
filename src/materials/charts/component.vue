@@ -44,7 +44,9 @@ const option = computed(() => {
 watch(
   option,
   newVal => {
-    chart.setOption(newVal)
+    chart.setOption(newVal, {
+      notMerge: true,
+    })
   },
   {
     deep: true,

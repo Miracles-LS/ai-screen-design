@@ -1,11 +1,22 @@
 import type { MaterialDefinition } from '@/schema/material.ts'
 import { createChartNodeSchema } from '@/materials/charts/schema.ts'
 
+const PieOptionsSchema = createChartNodeSchema('pie-chart')
 export const pieMaterial: MaterialDefinition = {
   name: '饼图',
   group: 'charts',
   icon: 'glyphs-poly:chart-pie',
-  configSchema: createChartNodeSchema('pie-chart'),
+  // 重写饼图配置schema
+  configSchema: PieOptionsSchema.extend({
+    // 通过 shape.xxx 才能拿到 xxx 的值
+    props: PieOptionsSchema.shape.props.extend({
+      // omit 方法表示排除 xAxis 和 yAxis 字段
+      option: PieOptionsSchema.shape.props.shape.option.omit({
+        xAxis: true,
+        yAxis: true,
+      }),
+    }),
+  }),
   setters: [
     {
       type: 'input',
