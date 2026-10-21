@@ -37,7 +37,7 @@ export const barMaterial: MaterialDefinition = {
     {
       type: 'color',
       label: '柱颜色',
-      key: 'props.option.series.0.itemStyle.color',
+      key: 'props.option.color.0',
     },
     {
       type: 'input',
