@@ -102,7 +102,7 @@ onMounted(() => {
 .message-box {
   .message-content {
     max-width: 85%;
-    background-color: #024c50;
+    background-color: #1e5893;
     padding: 8px 10px;
     border-radius: 6px 12px 12px 12px;
     .typing {
@@ -112,7 +112,7 @@ onMounted(() => {
   &-human {
     flex-direction: row-reverse;
     .message-content {
-      background-color: #3a8c91;
+      background-color: #409eff;
       border-radius: 12px 6px 12px 12px;
     }
   }

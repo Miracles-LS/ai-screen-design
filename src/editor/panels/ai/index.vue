@@ -159,7 +159,7 @@ async function onDelete() {
       <el-collapse v-if="showStep">
         <el-collapse-item>
           <template #title>
-            <div class="pl-20">任务进度</div>
+            <div class="pl-20 collapse-title">任务进度</div>
           </template>
           <el-steps
             class="pl-20"
@@ -184,7 +184,11 @@ async function onDelete() {
 </template>
 
 <style scoped lang="scss">
-.ai-panel {
+.ai-panel,
+.collapse-title {
   background: bg-mix(40);
+}
+.collapse-title {
+  position: relative;
 }
 </style>
