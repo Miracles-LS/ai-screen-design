@@ -9,6 +9,7 @@ import { getAllMaterialSchema } from '@/materials'
 import { CanvasSchema, DataSourceSchema } from '@/editor/schema/common.ts'
 import { deepClone } from '@/utils'
 import { toJSONSchema } from '@/utils/agent-schema.ts'
+import { SCHEMA_VERSION } from '@/schema/version.ts'
 
 defineOptions({
   name: 'AiPanel',
@@ -43,6 +44,15 @@ const {
 
 console.log('messages ==> ', messages)
 
+const editPlan = computed(() => langgraphState.value.editPlan as any)
+
+// 是否展示任务进度折叠面板
+const showStep = ref(false)
+
+watch(editPlan, newVal => {
+  showStep.value = !!newVal.length
+})
+
 const methodMap = {
   add_node: 'addNode',
   update_node: 'updateNodes',
@@ -74,6 +84,18 @@ watch(
 // 提交用户消息，发起对话
 function onSubmit() {
   if (isLoading.value || !message.value) return
+  showStep.value = false
+  // @ts-ignore
+  const version = langgraphState.value.schema?.version
+  const requestBody: Record<string, any> = {}
+  if (version !== SCHEMA_VERSION) {
+    requestBody.schema = {
+      version: SCHEMA_VERSION,
+      materials: getAllMaterialSchema(),
+      canvas: toJSONSchema(CanvasSchema),
+      dataSourceSchema: toJSONSchema(DataSourceSchema),
+    }
+  }
   submit({
     // 这里面提交的数据结构和 后端项目 agent-server/agent/state.ts 文件里面的 new StateSchema() 方法里面定义的数据格式保持一致。
     messages: [
@@ -90,11 +112,7 @@ function onSubmit() {
       type,
       dataDescription,
     })),
-    schema: {
-      materials: getAllMaterialSchema(),
-      canvas: toJSONSchema(CanvasSchema),
-      dataSourceSchema: toJSONSchema(DataSourceSchema),
-    },
+    ...requestBody,
   })
   message.value = ''
 }
@@ -126,7 +144,7 @@ async function onDelete() {
 </script>
 
 <template>
-  <div class="ai-panel">
+  <div class="ai-panel h-full select-text">
     <div class="p-20 flex flex-col h-full">
       <el-tooltip content="删除当前会话" placement="bottom" effect="dark">
         <span class="cursor-pointer translate-z-1" style="width: 3%" @click="onDelete">
@@ -138,6 +156,22 @@ async function onDelete() {
         :messages="messages"
         :isLoading="isLoading"
       ></MessageList>
+      <el-collapse v-if="showStep">
+        <el-collapse-item>
+          <template #title>
+            <div class="pl-20">任务进度</div>
+          </template>
+          <el-steps
+            class="pl-20"
+            direction="vertical"
+            :active="langgraphState.currentTaskIndex"
+            finish-status="success"
+            :space="40"
+          >
+            <el-step v-for="(task, index) in editPlan" :key="index" :title="task.title"></el-step>
+          </el-steps>
+        </el-collapse-item>
+      </el-collapse>
       <footer class="flex flex-col flex-none gap-10">
         <el-input type="textarea" :rows="4" v-model="message" @keydown.enter="onKeydown"></el-input>
         <el-button v-if="!isLoading" type="primary" @click="onSubmit" :loading="isLoading">
