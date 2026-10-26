@@ -123,6 +123,7 @@ export function getAllMaterialSchema() {
         type: item.schema.type,
         // Zod Schema 是 JavaScript 运行时对象，不能直接作为 Graph Input 通过 http 请求传输的话得转成标准的 json，所以这发送前需要调用 toJSONSchema()，把它转换成普通 JSON
         configSchema: toJSONSchema(item.configSchema),
+        eventOptions: item.eventOptions || [],
       }
     })
   return list

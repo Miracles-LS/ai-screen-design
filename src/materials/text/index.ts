@@ -51,8 +51,10 @@ const textMaterial: MaterialDefinition = {
   // 事件配置--所有事件类型
   eventOptions: [
     {
-      label: '文本组件特有的通用事件',
-      value: 'fn',
+      label: '点击事件',
+      value: 'click',
+      trigger: '用户点击文本节点时触发',
+      payload: 'MouseEvent，鼠标事件对象',
     },
   ],
 }

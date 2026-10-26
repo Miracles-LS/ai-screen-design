@@ -4,6 +4,7 @@ import type { MaterialEvent, MaterialSchema } from '@/schema/material.ts'
 import type { PageSchema } from '@/schema/page.ts'
 import { createRuntimeContext } from '@/runtime/context.ts'
 import { runSandbox } from '@/runtime/sandbox.ts'
+import { deepClone } from '@/utils/index.ts'
 
 defineOptions({
   name: 'ScreenRender',
@@ -11,7 +12,7 @@ defineOptions({
 
 const props = defineProps<{ page: PageSchema }>()
 
-const runtimePage = ref(props.page)
+const runtimePage = ref(deepClone(props.page))
 
 const context = createRuntimeContext(runtimePage)
 

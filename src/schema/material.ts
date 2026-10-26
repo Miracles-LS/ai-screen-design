@@ -52,6 +52,10 @@ interface SetterSchema {
 export interface EventOption {
   label: string
   value: string
+  // 触发时机
+  trigger: string
+  // 事件处理函数的参数payload
+  payload: string
 }
 
 // 物料 DSL 的类型约束
