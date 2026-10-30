@@ -44,10 +44,10 @@ const canvasStyle = computed(() => {
 // 处理组件在画布上显示的位置和大小
 function getNodeStyle(node: MaterialSchema, index: number) {
   return {
-    width: node.layout.width + 'px',
-    height: node.layout.height + 'px',
-    left: node.layout.x + 'px',
-    top: node.layout.y + 'px',
+    width: node?.layout?.width + 'px',
+    height: node?.layout?.height + 'px',
+    left: node?.layout?.x + 'px',
+    top: node?.layout?.y + 'px',
     zIndex: index + 1,
   }
 }

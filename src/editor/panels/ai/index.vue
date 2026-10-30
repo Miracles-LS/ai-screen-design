@@ -196,4 +196,8 @@ async function onDelete() {
 .collapse-title {
   position: relative;
 }
+:deep(.el-collapse-item__wrap) {
+  max-height: 300px;
+  overflow: auto;
+}
 </style>

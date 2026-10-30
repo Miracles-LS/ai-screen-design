@@ -11,6 +11,10 @@ export const TextSchema = NodeBaseSchema.extend({
     fontSize: z.number().default(20).describe('文本字号，默认是20px'),
   }),
   props: z.object({
-    content: z.string().describe('文本物料实际展示的文字内容；真实字段是 props.content'),
+    content: z
+      .string()
+      .describe(
+        '文本物料实际展示的文字内容；真实字段是 props.content。不是显示html代码，是用户要求要显示的文字内容。'
+      ),
   }),
 })
