@@ -46,8 +46,6 @@ const {
   },
 })
 
-console.log('messages ==> ', messages)
-
 const editPlan = computed(() => langgraphState.value.editPlan as any)
 
 // 是否展示任务进度折叠面板
@@ -63,6 +61,7 @@ const methodMap = {
   remove_node: 'removeNode',
   add_data_source: 'addDataSource',
   update_data_source: 'updateDataSource',
+  update_canvas: 'updateCanvas',
 }
 
 // 监听 state中 action 发生变化后，调用编辑器已有的 addNode() 方法

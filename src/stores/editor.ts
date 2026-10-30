@@ -219,6 +219,10 @@ export const useEditorStore = defineStore('editor', () => {
     applyChange(dataSources, 'value', newDataSources)
   }
 
+  function updateCanvas(newCanvas) {
+    applyChange(canvas, 'value', newCanvas)
+  }
+
   return {
     pannelVisable,
     page,
@@ -242,5 +246,6 @@ export const useEditorStore = defineStore('editor', () => {
     setPage,
     addDataSource,
     updateDataSource,
+    updateCanvas,
   }
 })
