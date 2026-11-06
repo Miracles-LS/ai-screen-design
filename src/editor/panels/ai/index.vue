@@ -33,7 +33,7 @@ const {
   // values 是 langgraph 后端返回的所有 State 数据
   values: langgraphState,
 } = useStream({
-  apiUrl: 'http://localhost:2024',
+  apiUrl: import.meta.env.VITE_API_URL ?? 'http://localhost:2024',
   assistantId: 'screen_design_agent',
   transport: 'sse', //默认是sse,也可修改此属性为 websocket。则切换为 websocket 模式
   // 如果本地已经保存过会话 ID，通过设置这个属性，传入历史对话的会话 ID，就能继续使用原来的会话。
