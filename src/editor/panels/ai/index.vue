@@ -13,7 +13,7 @@ import { SCHEMA_VERSION } from '@/schema/version.ts'
 /* 使用 Vite 的 ?raw 导入类型文件，就能拿到源文件的内容（纯字符串），而不是编译后的代码
    ?raw 导入的值是 TypeScript 源码字符串；后端把它作为提示词发给模型，事件运行时执行的仍是生成的 JavaScript。
 */
-import contextTypes from '@/runtime/context-Types.ts?raw'
+import contextTypes from '@/runtime/context-types.ts?raw'
 
 defineOptions({
   name: 'AiPanel',
