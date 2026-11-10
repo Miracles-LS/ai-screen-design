@@ -10,7 +10,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/ai-screen-design/',
+  base: '/ai-screen-design/', // GitHub Pages 项目页带二级路径，不设会 JS/CSS 全 404、页面空白
   plugins: [
     vue(),
     tailwindcss(),

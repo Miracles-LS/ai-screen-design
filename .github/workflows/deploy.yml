@@ -1,4 +1,4 @@
-name: Deploy Frontend to GitHub Pages
+name: 前端自动部署（develop → GitHub Pages）
 
 on:
   push:
@@ -16,42 +16,44 @@ concurrency:
 
 jobs:
   build:
+    name: 构建前端产物
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: 拉取前端代码（develop 分支）
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
+      - name: 安装 pnpm 包管理器
         uses: pnpm/action-setup@v4 # 自动读取 package.json 的 packageManager 版本
         with:
           version: 9 # ② 新增这两行（package.json 没有 packageManager 字段，不写会报错）
 
-      - name: Setup Node
+      - name: 安装 Node.js 22 并启用依赖缓存
         uses: actions/setup-node@v4
         with:
           node-version: 22 # ③ 原 20 → 22（你的 engines 要求 ^22.18，Vite 8 跑不了 20）
           cache: pnpm
 
-      - name: Install dependencies
+      - name: 安装项目依赖
         run: pnpm install --frozen-lockfile # 若无 pnpm-lock.yaml 或报错，改用 pnpm install
 
-      - name: Build（注入后端地址）
-        run: pnpm build-only # ④ 原 pnpm build → build-only（跳过 vue-tsc 类型检查，避免 CI 因类型报错挂掉）
+      - name: 构建前端并注入后端地址
+        run: pnpm build-only
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }} # 来自仓库 Settings → Secrets 中设置的 VITE_API_URL
 
-      - name: Upload artifact
+      - name: 上传构建产物供 Pages 部署
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist # Vite 构建产物目录
 
   deploy:
+    name: 发布到 GitHub Pages
     needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - name: 发布站点到 GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
