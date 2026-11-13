@@ -50,6 +50,16 @@ onMounted(() => {
     resizeObserver.disconnect()
   })
 })
+
+//获取图片地址
+function getImage(message) {
+  if (message.type === 'human' && Array.isArray(message.content)) {
+    const image = message.content.filter(item => {
+      return item.type === 'image_url'
+    })
+    return image?.[0]?.image_url?.url
+  }
+}
 </script>
 
 <template>
@@ -69,6 +79,12 @@ onMounted(() => {
           <Icon width="18" :icon="message.type === 'human' ? 'ri:user-fill' : 'ri:ai'"></Icon>
         </el-avatar>
         <div class="message-content">
+          <el-image
+            v-if="getImage(message)"
+            class="h-80"
+            fit="contain"
+            :src="getImage(message)"
+          ></el-image>
           <MarkdownRender
             v-if="message.text"
             :content="message.text"

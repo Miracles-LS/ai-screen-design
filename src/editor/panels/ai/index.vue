@@ -20,6 +20,8 @@ defineOptions({
 })
 
 const message = ref('')
+// 输入框的图片地址
+const image = ref('')
 
 const editorStore = useEditorStore()
 const { page, selectedNodeIds } = storeToRefs(editorStore)
@@ -100,12 +102,29 @@ function onSubmit() {
       contextTypes,
     }
   }
+
+  const text = message.value.trim()
+  const content = image.value
+    ? [
+        {
+          type: 'text',
+          text,
+        },
+        {
+          type: 'image_url',
+          image_url: {
+            url: image.value,
+          },
+        },
+      ]
+    : text
+
   submit({
     // 这里面提交的数据结构和 后端项目 agent-server/agent/state.ts 文件里面的 new StateSchema() 方法里面定义的数据格式保持一致。
     messages: [
       {
         type: 'human',
-        content: message.value,
+        content,
       },
     ],
     page: page.value,
@@ -119,6 +138,7 @@ function onSubmit() {
     ...requestBody,
   })
   message.value = ''
+  image.value = ''
 }
 
 // 输入框按enter事件
@@ -127,6 +147,20 @@ function onKeydown(e: KeyboardEvent) {
   if (e.shiftKey || e.isComposing) return
   onSubmit()
   e.preventDefault()
+}
+
+// 输入框的粘贴事件监听
+function onPaste(e: ClipboardEvent) {
+  const file = e?.clipboardData?.files?.[0]
+  // 限制粘贴的是图片类型
+  if (!file?.type?.startsWith('image/')) return
+
+  const reader = new FileReader()
+  reader.addEventListener('load', e => {
+    image.value = e.target?.result as string
+  })
+
+  reader.readAsDataURL(file)
 }
 
 // AI正在回复的停止功能
@@ -177,7 +211,17 @@ async function onDelete() {
         </el-collapse-item>
       </el-collapse>
       <footer class="flex flex-col flex-none gap-10">
-        <el-input type="textarea" :rows="4" v-model="message" @keydown.enter="onKeydown"></el-input>
+        <div v-if="image" class="flex gap-10 items-center">
+          <el-image class="h-80" :src="image" fit="contain"></el-image>
+          <el-button size="small" @click="image = ''">移除图片</el-button>
+        </div>
+        <el-input
+          type="textarea"
+          :rows="4"
+          v-model="message"
+          @keydown.enter="onKeydown"
+          @paste="onPaste"
+        ></el-input>
         <el-button v-if="!isLoading" type="primary" @click="onSubmit" :loading="isLoading">
           发送
         </el-button>
