@@ -23,6 +23,13 @@ const message = ref('')
 // 输入框的图片地址
 const image = ref('')
 
+// 任务进度的状态映射表，key是后端返回的任务 status，value 是 el-step 组件的status值
+const statusMap = {
+  pending: 'wait',
+  running: 'process',
+  success: 'success',
+}
+
 const editorStore = useEditorStore()
 const { page, selectedNodeIds } = storeToRefs(editorStore)
 const activeRunId = ref<string>(null)
@@ -199,14 +206,13 @@ async function onDelete() {
           <template #title>
             <div class="pl-20 collapse-title">任务进度</div>
           </template>
-          <el-steps
-            class="pl-20"
-            direction="vertical"
-            :active="langgraphState.currentTaskIndex"
-            finish-status="success"
-            :space="40"
-          >
-            <el-step v-for="(task, index) in editPlan" :key="index" :title="task.title"></el-step>
+          <el-steps class="pl-20" direction="vertical" finish-status="success" :space="40">
+            <el-step
+              v-for="(task, index) in editPlan"
+              :key="index"
+              :title="task.title"
+              :status="statusMap[task.status]"
+            ></el-step>
           </el-steps>
         </el-collapse-item>
       </el-collapse>
